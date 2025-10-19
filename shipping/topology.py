@@ -57,7 +57,7 @@ class PATopo( Topo ):
         # TODO: Add links
         # > self.addLink([DEVICE1], [DEVICE2]) 
         for i in range(1, num_links + 1):
-            link_info = lines[i].strip().split()
+            link_info = lines[i].strip().split(',')
             device1 = link_info[0]
             device2 = link_info[1]
             self.addLink(device1, device2)

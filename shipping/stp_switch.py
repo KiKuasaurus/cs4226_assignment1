@@ -67,7 +67,34 @@ class StpSwitch(app_manager.RyuApp):
         # DO NOT DELETE the table-miss entry!
         # CHECK_THIS_OUT
         # https://ryu.readthedocs.io/en/latest/ofproto_v1_3_ref.html#ryu.ofproto.ofproto_v1_3_parser.OFPFlowMod
-        pass
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        cookie = cookie_mask = 0
+        idle_timeout = hard_timeout = 0
+        priority = 1
+        buffer_id = ofproto.OFP_NO_BUFFER
+        match = parser.OFPMatch()
+        actions = [parser.OFPActionOutput(ofproto.OFPP_NORMAL, 0),]
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
+
+        req = parser.OFPFlowMod(
+            datapath=datapath,
+            cookie=cookie,
+            cookie_mask=cookie_mask,
+            command=ofproto.OFPFC_DELETE,
+            idle_timeout=idle_timeout,
+            hard_timeout=hard_timeout,
+            priority=priority,
+            buffer_id=buffer_id,
+            out_port=ofproto.OFPP_ANY,
+            out_group=ofproto.OFPG_ANY,
+            match=match,
+            instructions=inst
+        )
+
+        datapath.send_msg(req)
+
         
 
     @set_ev_cls(stplib.EventPacketIn, MAIN_DISPATCHER)
@@ -77,7 +104,7 @@ class StpSwitch(app_manager.RyuApp):
         # Notice that the decorator of this function is different
         # the handler for the simple switch listens to ofp_event.EventOFPPacketIn
         # while here we are listening to stplib.EventPacketIn
-                # get the datapath (i.e. switch) related
+        # get the datapath (i.e. switch) related
         # and the port where the packet came in from
         msg = ev.msg
         datapath = msg.datapath

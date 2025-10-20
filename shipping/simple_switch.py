@@ -97,26 +97,38 @@ class SimpleSwitch(app_manager.RyuApp):
         # learn a mac address to avoid FLOOD next time.
         # TODO: Add a MAC-to-port mapping between the source mac address and income port
         # to the in-memory dictionary (self.mac_to_port)
-        
+        self.mac_to_port[dpid][src] = in_port
 
         # TODO: check if there is an entry corresponding to the destination mac in self.mac_to_port
         # Set the output port accordingly if yes, set output port to flood if none
         # CHECK_THIS_OUT (pay attention to the example)
         # https://ryu.readthedocs.io/en/latest/ofproto_v1_3_ref.html#ryu.ofproto.ofproto_v1_3_parser.OFPPacketOut
-        
+        if dst in self.mac_to_port[dpid]:
+            out_port = self.mac_to_port[dpid][dst]
+        else:
+            out_port = ofproto.OFPP_FLOOD
 
         # TODO: create a list of actions that instructs the switch to forward the packet to the output port
+        actions = [parser.OFPActionOutput(out_port, 0)]
         
         # TODO: check if the output port is flood
         # if not flooded
         # install a flow to avoid packet_in next time
-        
-            # TODO: create an OFPMatch instance to match all the packets
-            # with (ethernet source address==src AND ethernet destination address==dst AND received from in_port)
-            # use self.add_flow()
-            # CHECK_THIS_OUT
-            # https://ryu.readthedocs.io/en/latest/ofproto_v1_3_ref.html#ryu.ofproto.ofproto_v1_3_parser.OFPMatch
-            
+        if out_port != ofproto.OFPP_FLOOD:
+
+        # TODO: create an OFPMatch instance to match all the packets
+        # with (ethernet source address==src AND ethernet destination address==dst AND received from in_port)
+        # use self.add_flow()
+        # CHECK_THIS_OUT
+        # https://ryu.readthedocs.io/en/latest/ofproto_v1_3_ref.html#ryu.ofproto.ofproto_v1_3_parser.OFPMatch
+            ofp_match = parser.OFPMatch(eth_src=src, eth_dst=dst, in_port=in_port)
+
+            self.add_flow(
+                datapath= datapath,
+                priority= 1,
+                match= ofp_match,
+                actions= actions
+            )
         
         # TODO: Send the packet out message for the current packet if the packet is not buffered on the switch
         # check if msg.buffer_id is ofproto.OFP_NO_BUFFER
@@ -125,4 +137,8 @@ class SimpleSwitch(app_manager.RyuApp):
         # and it will automatically forward it according to the flow rule just installed
         # CHECK_THIS_OUT
         # https://ryu.readthedocs.io/en/latest/ofproto_v1_3_ref.html#ryu.ofproto.ofproto_v1_3_parser.OFPPacketOut
+        if msg.buffer_id == ofproto.OFP_NO_BUFFER:
+            req = parser.OFPPacketOut(datapath, msg.buffer_id, 
+                                          in_port, actions, msg.data)
+            datapath.send_msg(req)
         

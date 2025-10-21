@@ -184,7 +184,7 @@ class StpSwitch(app_manager.RyuApp):
         self.logger.info("[dpid=%s] %s", dpid_str, msg)
 
         # TODO: If there are any flow rules added to the datapath through the learning process, delete those
-        if dp.id in self.mac_to_port:
-            del self.mac_to_port[dp.id]
-        self.delete_flow(dp)
+        # if dp.id in self.mac_to_port:
+        #     del self.mac_to_port[dp.id]
+        # self.delete_flow(dp)
         

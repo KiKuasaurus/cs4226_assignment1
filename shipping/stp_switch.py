@@ -70,14 +70,24 @@ class StpSwitch(app_manager.RyuApp):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
 
+        cookie = cookie_mask = 0
+        idle_timeout = hard_timeout = 0
         priority = 1
+        buffer_id = ofproto.OFP_NO_BUFFER
+        match = parser.OFPMatch(eth_type=0x0800)
 
         req = parser.OFPFlowMod(
             datapath=datapath,
+            cookie=cookie,
+            cookie_mask=cookie_mask,
             command=ofproto.OFPFC_DELETE,
+            idle_timeout=idle_timeout,
+            hard_timeout=hard_timeout,
             priority=priority,
+            buffer_id=buffer_id,
             out_port=ofproto.OFPP_ANY,
             out_group=ofproto.OFPG_ANY,
+            match=match,
         )
 
         datapath.send_msg(req)

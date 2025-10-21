@@ -71,7 +71,6 @@ class StpSwitch(app_manager.RyuApp):
         parser = datapath.ofproto_parser
 
         priority = 1
-        match = parser.OFPMatch()
 
         req = parser.OFPFlowMod(
             datapath=datapath,
@@ -79,7 +78,6 @@ class StpSwitch(app_manager.RyuApp):
             priority=priority,
             out_port=ofproto.OFPP_ANY,
             out_group=ofproto.OFPG_ANY,
-            match=match,
         )
 
         datapath.send_msg(req)

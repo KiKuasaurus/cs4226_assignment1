@@ -75,8 +75,6 @@ class StpSwitch(app_manager.RyuApp):
         priority = 1
         buffer_id = ofproto.OFP_NO_BUFFER
         match = parser.OFPMatch()
-        actions = [parser.OFPActionOutput(ofproto.OFPP_NORMAL, 0),]
-        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
 
         req = parser.OFPFlowMod(
             datapath=datapath,
@@ -87,8 +85,9 @@ class StpSwitch(app_manager.RyuApp):
             hard_timeout=hard_timeout,
             priority=priority,
             buffer_id=buffer_id,
+            out_port=ofproto.OFPP_ANY,
+            out_group=ofproto.OFPG_ANY,
             match=match,
-            instructions=inst
         )
 
         datapath.send_msg(req)

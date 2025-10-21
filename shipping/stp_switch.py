@@ -87,8 +87,6 @@ class StpSwitch(app_manager.RyuApp):
             hard_timeout=hard_timeout,
             priority=priority,
             buffer_id=buffer_id,
-            out_port=ofproto.OFPP_ANY,
-            out_group=ofproto.OFPG_ANY,
             match=match,
             instructions=inst
         )
